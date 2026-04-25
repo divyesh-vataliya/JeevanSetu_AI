@@ -10,9 +10,12 @@ from django.conf import settings
 _models = None
 _label_encoder_sex = None
 _label_encoder_activity = None
-_targets = ['Calories (kcal)', 'Protein (g)', 'Carbohydrates (g)', 'Fats (g)', 'Water (L)',
-            'Vitamin A (mcg)', 'Vitamin B12 (mcg)', 'Vitamin C (mg)', 'Vitamin D (IU)',
-            'Calcium (mg)', 'Iron (mg)', 'Magnesium (mg)', 'Zinc (mg)', 'Omega-3 (mg)']
+_targets_categorized = {
+    'Macronutrients': ['Calories (kcal)', 'Protein (g)', 'Carbohydrates (g)', 'Fats (g)', 'Water (L)'],
+    'Vitamins': ['Vitamin A (mcg)', 'Vitamin B12 (mcg)', 'Vitamin C (mg)', 'Vitamin D (IU)'],
+    'Minerals & Others': ['Calcium (mg)', 'Iron (mg)', 'Magnesium (mg)', 'Zinc (mg)', 'Omega-3 (mg)']
+}
+_targets = [item for sublist in _targets_categorized.values() for item in sublist]
 
 import joblib
 
@@ -97,6 +100,14 @@ def predict_nutritional_requirements(age, height, weight, activity, sex, pregnan
     except Exception as e:
         print(f"Error in prediction: {str(e)}")
         return None
+
+def get_categorized_predictions(predictions):
+    if not predictions:
+        return None
+    categorized = {}
+    for cat, keys in _targets_categorized.items():
+        categorized[cat] = {k: predictions[k] for k in keys if k in predictions}
+    return categorized
 
 def get_supplement_data():
     return {

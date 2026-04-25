@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
+    <div id="scroll-progress"></div>
     <nav>
         <div class="nav-container">
             <a href="{% url 'index' %}" class="logo">JeevanSetu AI</a>
@@ -19,10 +20,10 @@
                 {% if user.is_authenticated %}
                     <li><a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard</a></li>
                     <li><a href="{% url 'supplements' %}" class="{% if request.resolver_match.url_name == 'supplements' %}active{% endif %}">Supplements</a></li>
-                    <li><a href="{% url 'logout' %}" class="btn btn-outline" style="padding: 0.5rem 1rem;">Logout</a></li>
+                    <li><a href="{% url 'logout' %}" class="btn btn-outline">Logout</a></li>
                 {% else %}
-                    <li><a href="{% url 'login' %}" class="btn btn-outline" style="padding: 0.5rem 1rem;">Login</a></li>
-                    <li><a href="{% url 'register' %}" class="btn btn-primary" style="padding: 0.5rem 1rem;">Sign Up</a></li>
+                    <li><a href="{% url 'login' %}" class="btn btn-outline">Login</a></li>
+                    <li><a href="{% url 'register' %}" class="btn btn-primary">Sign Up</a></li>
                 {% endif %}
             </ul>
         </div>
@@ -45,5 +46,21 @@
     <footer>
         <p>&copy; 2026 JeevanSetu AI. Designed for a healthier future.</p>
     </footer>
+
+    <script>
+        window.onscroll = function() {
+            var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            var scrolled = (winScroll / height) * 100;
+            document.getElementById("scroll-progress").style.width = scrolled + "%";
+        };
+
+        function showLoading(btn) {
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="spinner"></span> Analyzing...';
+            btn.disabled = true;
+            btn.form.submit();
+        }
+    </script>
 </body>
 </html>

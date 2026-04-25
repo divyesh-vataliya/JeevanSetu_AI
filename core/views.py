@@ -61,8 +61,11 @@ def dashboard(request):
             predictions = predict_nutritional_requirements(age, height, weight, activity, sex, pregnant)
             
             if predictions:
+                # Categorize results for UI
+                from .utils import get_categorized_predictions
+                predictions_categorized = get_categorized_predictions(predictions)
+                
                 # Calculate Deficiency (Gap)
-                # We assume the user might provide their current intake, or we can use a baseline
                 current_intake = {
                     'Calories (kcal)': float(request.POST.get('current_calories') or 0),
                     'Protein (g)': float(request.POST.get('current_protein') or 0),
@@ -82,16 +85,12 @@ def dashboard(request):
                             'surplus': -diff if diff < 0 else 0,
                             'percentage': (current_intake[key] / required * 100) if required > 0 else 0
                         }
-            
-            if not predictions:
-                messages.error(request, "Error making prediction. Please check your inputs.")
-        except Exception as e:
-            messages.error(request, f"Error: {str(e)}")
-            
-    return render(request, 'core/dashboard.html', {
-        'predictions': predictions,
-        'gap_analysis': gap_analysis
-    })
+                
+                return render(request, 'core/dashboard.html', {
+                    'predictions': predictions_categorized,
+                    'gap_analysis': gap_analysis,
+                    'raw_predictions': predictions
+                })
 
 @login_required
 def supplements(request):

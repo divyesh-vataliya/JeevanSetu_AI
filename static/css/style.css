@@ -15,6 +15,33 @@
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+#scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 4px;
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    z-index: 1001;
+    transition: width 0.1s;
+}
+
+.spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -71,36 +98,43 @@ nav {
 
 .nav-links {
     display: flex;
-    gap: 2rem;
+    gap: 1rem;
     list-style: none;
+    align-items: center;
 }
 
 .nav-links a {
-    font-weight: 500;
+    font-weight: 600;
     color: var(--muted);
+    padding: 0.6rem 1.2rem;
+    border-radius: 999px;
+    font-size: 0.95rem;
 }
 
-.nav-links a:hover {
+.nav-links a:not(.btn):hover {
     color: var(--primary);
+    background: rgba(15, 118, 110, 0.05);
 }
 
 .nav-links a.active {
     color: var(--primary);
+    background: rgba(15, 118, 110, 0.1);
 }
 
 .btn {
-    padding: 0.75rem 1.5rem;
-    border-radius: var(--radius);
+    padding: 0.6rem 1.5rem;
+    border-radius: 999px;
     font-weight: 600;
     cursor: pointer;
     transition: var(--transition);
     border: none;
     display: inline-block;
+    font-size: 0.95rem;
 }
 
 .btn-primary {
     background: var(--primary);
-    color: white;
+    color: white !important;
     box-shadow: 0 4px 6px -1px rgba(15, 118, 110, 0.2);
 }
 
@@ -113,12 +147,12 @@ nav {
 .btn-outline {
     background: transparent;
     border: 2px solid var(--primary);
-    color: var(--primary);
+    color: var(--primary) !important;
 }
 
 .btn-outline:hover {
     background: var(--primary);
-    color: white;
+    color: white !important;
 }
 
 /* Hero Section */
