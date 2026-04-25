@@ -75,6 +75,26 @@
     <!-- Results Display -->
     <div class="results-container">
         {% if predictions %}
+            <!-- Top Deficiencies Alert -->
+            {% if top_deficiencies %}
+                <div class="card" style="margin-bottom: 2rem; background: #fff1f2; border-left: 5px solid #ef4444; animation: pulse 2s infinite;">
+                    <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                        <span style="font-size: 1.5rem; margin-right: 1rem;">⚠️</span>
+                        <h3 style="color: #991b1b; margin: 0;">Critical Nutritional Deficiencies</h3>
+                    </div>
+                    <p style="color: #b91c1c; margin-bottom: 1.5rem;">Based on your current intake, your body is lacking the following essential nutrients:</p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        {% for item in top_deficiencies %}
+                            <div style="background: rgba(255, 255, 255, 0.5); padding: 1rem; border-radius: 1rem; border: 1px solid rgba(239, 68, 68, 0.2);">
+                                <div style="font-weight: 700; color: #7f1d1d;">{{ item.name }}</div>
+                                <div style="font-size: 1.2rem; color: #ef4444; font-weight: 800;">{{ item.gap|stringformat:".1f" }} more needed</div>
+                                <div style="font-size: 0.85rem; color: #991b1b; opacity: 0.8;">Only {{ item.percentage|stringformat:".1f" }}% of target met</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
             <!-- Gap Analysis Section -->
             {% if gap_analysis %}
                 <div class="card" style="margin-bottom: 2rem; border-left: 5px solid var(--accent);">

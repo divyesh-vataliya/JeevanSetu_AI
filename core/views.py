@@ -94,10 +94,21 @@ def dashboard(request):
                             'percentage': (current_intake[key] / required * 100) if required > 0 else 0
                         }
                 
+                # Identify top deficiencies (where percentage < 90)
+                top_deficiencies = []
+                if gap_analysis:
+                    # Sort by percentage met (lowest first)
+                    sorted_gaps = sorted(gap_analysis.items(), key=lambda x: x[1]['percentage'])
+                    top_deficiencies = [
+                        {'name': name, 'gap': data['gap'], 'percentage': data['percentage']}
+                        for name, data in sorted_gaps if data['percentage'] < 90
+                    ]
+
                 return render(request, 'core/dashboard.html', {
                     'predictions': predictions_categorized,
                     'gap_analysis': gap_analysis,
                     'raw_predictions': predictions,
+                    'top_deficiencies': top_deficiencies,
                     'quotes': quotes
                 })
                 
