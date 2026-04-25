@@ -19,6 +19,9 @@ _targets = [item for sublist in _targets_categorized.values() for item in sublis
 
 import joblib
 
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+
 def get_ml_resources():
     global _models, _label_encoder_sex, _label_encoder_activity
     
@@ -40,7 +43,7 @@ def get_ml_resources():
             encoders = joblib.load(encoders_cache_path)
             _label_encoder_sex = encoders['sex']
             _label_encoder_activity = encoders['activity']
-            print("Loaded models from cache.")
+            print("Loaded optimized models from cache.")
             return _models, _label_encoder_sex, _label_encoder_activity
         except Exception as e:
             print(f"Error loading from cache: {e}. Retraining...")
@@ -62,21 +65,35 @@ def get_ml_resources():
     data['Activity Level'] = _label_encoder_activity.fit_transform(data['Activity Level'])
     data['Pregnant'] = data['Pregnant'].replace(['NULL', np.nan], 0).astype(int)
     
-    features = ['Age', 'Height (cm)', 'Weight (kg)', 'Sex', 'Activity Level', 'Pregnant']
+    # Feature Engineering: BMI
+    data['BMI'] = data['Weight (kg)'] / ((data['Height (cm)'] / 100) ** 2)
+    
+    features = ['Age', 'Height (cm)', 'Weight (kg)', 'Sex', 'Activity Level', 'Pregnant', 'BMI']
     X = data[features]
     y = data[_targets]
     
-    # Train
+    # Train Optimized Models
     _models = {}
     for target in _targets:
-        model = RandomForestRegressor(n_estimators=100, random_state=42)
-        model.fit(X, y[target]) # Train on all data for production
-        _models[target] = model
+        # Pipeline with scaling for better accuracy
+        pipeline = Pipeline([
+            ('scaler', StandardScaler()),
+            ('rf', RandomForestRegressor(
+                n_estimators=200, 
+                max_depth=15,
+                min_samples_split=2,
+                min_samples_leaf=1,
+                random_state=42,
+                n_jobs=-1 # Parallel training
+            ))
+        ])
+        pipeline.fit(X, y[target])
+        _models[target] = pipeline
     
     # Save to cache
     joblib.dump(_models, model_cache_path)
     joblib.dump({'sex': _label_encoder_sex, 'activity': _label_encoder_activity}, encoders_cache_path)
-    print("Trained and cached models.")
+    print("Trained and cached optimized models with Pipeline.")
         
     return _models, _label_encoder_sex, _label_encoder_activity
 
@@ -88,8 +105,11 @@ def predict_nutritional_requirements(age, height, weight, activity, sex, pregnan
         sex_encoded = le_sex.transform([sex])[0]
         activity_encoded = le_activity.transform([activity])[0]
         
+        # Calculate BMI for better accuracy
+        bmi = weight / ((height / 100) ** 2)
+        
         # Create input array
-        user_input = np.array([[age, height, weight, sex_encoded, activity_encoded, pregnant]])
+        user_input = np.array([[age, height, weight, sex_encoded, activity_encoded, pregnant, bmi]])
         
         # Predict all targets
         predictions = {}
@@ -131,10 +151,15 @@ def get_supplement_data():
             'benefits': ['Bone health', 'Calcium absorption', 'Immune function'],
             'icon': '☀️'
         },
+        'Vitamin K2': {
+            'natural_sources': ['Natto', 'Hard cheeses', 'Egg yolks', 'Fermented foods'],
+            'benefits': ['Bone density', 'Cardiovascular health', 'Calcium regulation'],
+            'icon': '🦴'
+        },
         'Calcium': {
             'natural_sources': ['Dairy products', 'Leafy greens', 'Sardines', 'Tofu'],
             'benefits': ['Bone health', 'Muscle function', 'Nerve signaling'],
-            'icon': '🦴'
+            'icon': '🦷'
         },
         'Iron': {
             'natural_sources': ['Red meat', 'Beans', 'Spinach', 'Fortified cereals'],
@@ -155,5 +180,81 @@ def get_supplement_data():
             'natural_sources': ['Fatty fish', 'Flaxseeds', 'Chia seeds', 'Walnuts'],
             'benefits': ['Heart health', 'Brain function', 'Reduced inflammation'],
             'icon': '🐟'
+        },
+        'Probiotics': {
+            'natural_sources': ['Yogurt', 'Kefir', 'Sauerkraut', 'Kimchi', 'Kombucha'],
+            'benefits': ['Gut health', 'Immune function', 'Digestion'],
+            'icon': '🦠'
+        },
+        'Biotin': {
+            'natural_sources': ['Eggs', 'Almonds', 'Cauliflower', 'Sweet potatoes', 'Spinach'],
+            'benefits': ['Hair growth', 'Skin health', 'Nail strength'],
+            'icon': '💅'
+        },
+        'Potassium': {
+            'natural_sources': ['Bananas', 'Avocados', 'Potatoes', 'Spinach', 'Coconut water'],
+            'benefits': ['Blood pressure regulation', 'Muscle contractions', 'Fluid balance'],
+            'icon': '🍌'
+        },
+        'Selenium': {
+            'natural_sources': ['Brazil nuts', 'Fish', 'Ham', 'Brown rice', 'Sunflower seeds'],
+            'benefits': ['Antioxidant properties', 'Thyroid health', 'Immune system support'],
+            'icon': '💎'
+        },
+        'Iodine': {
+            'natural_sources': ['Seaweed', 'Cod', 'Dairy products', 'Iodized salt', 'Shrimp'],
+            'benefits': ['Thyroid function', 'Cognitive development', 'Metabolism'],
+            'icon': '🌊'
         }
     }
+
+def adjust_predictions_by_goal(predictions, goal):
+    """
+    Adjusts predicted values based on user's health goal.
+    """
+    if not predictions or not goal:
+        return predictions
+        
+    adjusted = predictions.copy()
+    
+    if goal == 'Weight Loss':
+        adjusted['Calories (kcal)'] *= 0.85 # 15% deficit
+        adjusted['Protein (g)'] *= 1.2 # Higher protein for satiety and muscle retention
+    elif goal == 'Muscle Gain':
+        adjusted['Calories (kcal)'] *= 1.15 # 15% surplus
+        adjusted['Protein (g)'] *= 1.5 # Significantly higher protein
+        adjusted['Carbohydrates (g)'] *= 1.1 # More fuel for workouts
+    elif goal == 'Athletic Performance':
+        adjusted['Carbohydrates (g)'] *= 1.3 # High carb for energy
+        adjusted['Water (L)'] += 1.0 # Extra hydration
+        
+    return adjusted
+
+def get_motivational_quotes():
+    return [
+        {
+            'text': "Take care of your body. It's the only place you have to live.",
+            'author': "Jim Rohn",
+            'emoji': "🏠"
+        },
+        {
+            'text': "Let food be thy medicine and medicine be thy food.",
+            'author': "Hippocrates",
+            'emoji': "🥗"
+        },
+        {
+            'text': "Health is a state of complete harmony of the body, mind and spirit.",
+            'author': "B.K.S. Iyengar",
+            'emoji': "🧘"
+        },
+        {
+            'text': "The only way to keep your health is to eat what you don't want, drink what you don't like, and do what you'd rather not.",
+            'author': "Mark Twain",
+            'emoji': "🏃"
+        },
+        {
+            'text': "Your health is an investment, not an expense.",
+            'author': "Unknown",
+            'emoji': "💰"
+        }
+    ]

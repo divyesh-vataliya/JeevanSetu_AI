@@ -1,4 +1,5 @@
 {% extends 'core/base.html' %}
+{% load static %}
 
 {% block title %}Dashboard - JeevanSetu AI{% endblock %}
 
@@ -29,6 +30,16 @@
                     <option value="Heavy">Heavy (6-7 days/week)</option>
                 </select>
             </div>
+            <div class="form-group">
+                <label>Health Goal</label>
+                <select name="goal">
+                    <option value="Maintenance">Maintenance (Stay Healthy)</option>
+                    <option value="Weight Loss">Weight Loss (Fat Loss)</option>
+                    <option value="Muscle Gain">Muscle Gain (Bulking)</option>
+                    <option value="Athletic Performance">Athletic Performance</option>
+                </select>
+            </div>
+            
             <div class="form-group">
                 <label>Sex</label>
                 <select name="sex" id="sex-select" onchange="togglePregnancy()">
@@ -119,6 +130,21 @@
     </div>
 </div>
 
+<!-- Quotes Section -->
+<section style="padding: 4rem 2rem; max-width: 1200px; margin: 4rem auto 0 auto; background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{% static "images/quotes.png" %}'); background-size: cover; background-position: center; border-radius: 2rem; color: white; text-align: center; overflow: hidden;" class="animate-fade-in">
+    <div style="padding: 2rem;">
+        <h2 style="color: white; font-size: 2.5rem; margin-bottom: 2rem;">Motivational Health Quotes</h2>
+        <div id="quote-carousel" style="min-height: 150px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            {% for quote in quotes %}
+                <div class="quote-item" style="display: {% if forloop.first %}block{% else %}none{% endif %}; animation: fadeIn 1s ease-out;">
+                    <p style="font-size: 1.5rem; font-style: italic; margin-bottom: 1rem;">{{ quote.emoji }} "{{ quote.text }}"</p>
+                    <p style="font-weight: 600; opacity: 0.8;">— {{ quote.author }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
 <script>
     function togglePregnancy() {
         const sex = document.getElementById('sex-select').value;
@@ -128,6 +154,17 @@
         } else {
             pregGroup.style.display = 'none';
         }
+    }
+
+    // Quote Carousel Logic
+    let currentQuote = 0;
+    const quotes = document.querySelectorAll('.quote-item');
+    if (quotes.length > 0) {
+        setInterval(() => {
+            quotes[currentQuote].style.display = 'none';
+            currentQuote = (currentQuote + 1) % quotes.length;
+            quotes[currentQuote].style.display = 'block';
+        }, 5000);
     }
 </script>
 {% endblock %}

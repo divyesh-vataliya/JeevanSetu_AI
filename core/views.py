@@ -49,6 +49,9 @@ def logout_view(request):
 def dashboard(request):
     predictions = None
     gap_analysis = None
+    from .utils import get_motivational_quotes, adjust_predictions_by_goal
+    quotes = get_motivational_quotes()
+    
     if request.method == 'POST':
         try:
             age = int(request.POST.get('age'))
@@ -56,11 +59,16 @@ def dashboard(request):
             weight = float(request.POST.get('weight'))
             activity = request.POST.get('activity')
             sex = request.POST.get('sex')
+            goal = request.POST.get('goal')
             pregnant = 1 if request.POST.get('pregnant') == 'yes' and sex == 'Female' else 0
             
-            predictions = predict_nutritional_requirements(age, height, weight, activity, sex, pregnant)
+            # Get base predictions
+            raw_predictions = predict_nutritional_requirements(age, height, weight, activity, sex, pregnant)
             
-            if predictions:
+            if raw_predictions:
+                # Adjust based on goal
+                predictions = adjust_predictions_by_goal(raw_predictions, goal)
+                
                 # Categorize results for UI
                 from .utils import get_categorized_predictions
                 predictions_categorized = get_categorized_predictions(predictions)
@@ -89,8 +97,20 @@ def dashboard(request):
                 return render(request, 'core/dashboard.html', {
                     'predictions': predictions_categorized,
                     'gap_analysis': gap_analysis,
-                    'raw_predictions': predictions
+                    'raw_predictions': predictions,
+                    'quotes': quotes
                 })
+                
+            if not predictions:
+                messages.error(request, "Error making prediction. Please check your inputs.")
+        except Exception as e:
+            messages.error(request, f"Error: {str(e)}")
+            
+    return render(request, 'core/dashboard.html', {
+        'predictions': predictions,
+        'gap_analysis': gap_analysis,
+        'quotes': quotes
+    })
 
 @login_required
 def supplements(request):
