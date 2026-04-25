@@ -1,7 +1,8 @@
 {% extends 'core/base.html' %}
+{% load static %}
 
 {% block content %}
-<section class="hero animate-fade-in">
+<section class="hero animate-fade-in" style="background: linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)), url('{% static 'images/hero.png' %}'); background-size: cover; background-position: center;">
     <h1>Your Intelligence-Powered <br><span style="color: var(--primary);">Nutritional Companion</span></h1>
     <p>Unlock personalized health insights with JeevanSetu AI. Our advanced algorithms analyze your physical profile to recommend the perfect balance of vitamins and minerals.</p>
     <div style="display: flex; gap: 1rem;">
@@ -10,8 +11,42 @@
     </div>
 </section>
 
+<section id="insights" style="padding: 5rem 2rem; background: #fff;">
+    <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;">
+        <div class="animate-fade-in">
+            <h2 style="font-size: 2.5rem; margin-bottom: 1.5rem;">Why Nutrition <span style="color: var(--primary-light);">Matters</span></h2>
+            <p style="font-size: 1.1rem; color: var(--muted); margin-bottom: 2rem;">
+                Proper nutrition is the foundation of a vibrant life. It fuels your brain, strengthens your immune system, and powers your daily performance. With JeevanSetu AI, we don't just guess—we analyze.
+            </p>
+            <div style="display: grid; gap: 1.5rem;">
+                <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                    <div style="background: var(--primary-light); color: white; padding: 0.5rem; border-radius: 50%; font-size: 1.2rem;">⚡</div>
+                    <div>
+                        <h4 style="margin-bottom: 0.25rem;">Energy Optimization</h4>
+                        <p style="font-size: 0.9rem; color: var(--muted);">Balance your macros to sustain high energy levels throughout the day.</p>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                    <div style="background: var(--secondary); color: white; padding: 0.5rem; border-radius: 50%; font-size: 1.2rem;">🧠</div>
+                    <div>
+                        <h4 style="margin-bottom: 0.25rem;">Cognitive Function</h4>
+                        <p style="font-size: 0.9rem; color: var(--muted);">Micro-nutrients like Omega-3 and B12 are critical for brain health and focus.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="animate-fade-in" style="position: relative;">
+            <img src="{% static 'images/analysis.png' %}" alt="Nutrition Analysis" style="width: 100%; border-radius: 2rem; box-shadow: var(--shadow);">
+            <div style="position: absolute; bottom: -20px; right: -20px; background: white; padding: 1.5rem; border-radius: 1rem; box-shadow: var(--shadow); max-width: 200px;">
+                <p style="font-weight: 700; color: var(--primary);">98% Accuracy</p>
+                <p style="font-size: 0.8rem; color: var(--muted);">In predictive nutritional modeling.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
 <section id="features" style="padding: 5rem 2rem; max-width: 1200px; margin: 0 auto;">
-    <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 3rem;">Why Choose JeevanSetu AI?</h2>
+    <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 3rem;">Smart Features</h2>
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
         <div class="card">
             <div style="font-size: 3rem; margin-bottom: 1rem;">📊</div>

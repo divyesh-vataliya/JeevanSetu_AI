@@ -14,19 +14,38 @@ _targets = ['Calories (kcal)', 'Protein (g)', 'Carbohydrates (g)', 'Fats (g)', '
             'Vitamin A (mcg)', 'Vitamin B12 (mcg)', 'Vitamin C (mg)', 'Vitamin D (IU)',
             'Calcium (mg)', 'Iron (mg)', 'Magnesium (mg)', 'Zinc (mg)', 'Omega-3 (mg)']
 
+import joblib
+
 def get_ml_resources():
     global _models, _label_encoder_sex, _label_encoder_activity
     
     if _models is not None:
         return _models, _label_encoder_sex, _label_encoder_activity
     
+    # Define paths for cached models
+    cache_dir = os.path.join(settings.BASE_DIR, 'ml_cache')
+    if not os.path.exists(cache_dir):
+        os.makedirs(cache_dir)
+    
+    model_cache_path = os.path.join(cache_dir, 'models.joblib')
+    encoders_cache_path = os.path.join(cache_dir, 'encoders.joblib')
+    
+    # Try to load from cache
+    if os.path.exists(model_cache_path) and os.path.exists(encoders_cache_path):
+        try:
+            _models = joblib.load(model_cache_path)
+            encoders = joblib.load(encoders_cache_path)
+            _label_encoder_sex = encoders['sex']
+            _label_encoder_activity = encoders['activity']
+            print("Loaded models from cache.")
+            return _models, _label_encoder_sex, _label_encoder_activity
+        except Exception as e:
+            print(f"Error loading from cache: {e}. Retraining...")
+
     # Load the dataset
     data_path = os.path.join(settings.BASE_DIR, 'data', 'nutritional_requirements_extended.csv')
-    
     if not os.path.exists(data_path):
-        # Fallback for different structures
         data_path = os.path.join(settings.BASE_DIR, 'nutrition app', 'nutritional_requirements_extended.csv')
-        
     if not os.path.exists(data_path):
         raise FileNotFoundError(f"Dataset not found at {data_path}")
     
@@ -36,7 +55,6 @@ def get_ml_resources():
     # Label Encoding
     _label_encoder_sex = LabelEncoder()
     _label_encoder_activity = LabelEncoder()
-    
     data['Sex'] = _label_encoder_sex.fit_transform(data['Sex'])
     data['Activity Level'] = _label_encoder_activity.fit_transform(data['Activity Level'])
     data['Pregnant'] = data['Pregnant'].replace(['NULL', np.nan], 0).astype(int)
@@ -45,14 +63,17 @@ def get_ml_resources():
     X = data[features]
     y = data[_targets]
     
-    # Split and Train
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    
+    # Train
     _models = {}
     for target in _targets:
         model = RandomForestRegressor(n_estimators=100, random_state=42)
-        model.fit(X_train, y_train[target])
+        model.fit(X, y[target]) # Train on all data for production
         _models[target] = model
+    
+    # Save to cache
+    joblib.dump(_models, model_cache_path)
+    joblib.dump({'sex': _label_encoder_sex, 'activity': _label_encoder_activity}, encoders_cache_path)
+    print("Trained and cached models.")
         
     return _models, _label_encoder_sex, _label_encoder_activity
 

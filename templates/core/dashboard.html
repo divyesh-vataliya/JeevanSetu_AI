@@ -43,15 +43,54 @@
                     <option value="yes">Yes</option>
                 </select>
             </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Analyze Requirements</button>
+
+            <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border);">
+            <h4 style="margin-bottom: 1rem; color: var(--primary);">Current Intake (Optional)</h4>
+            <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 1rem;">Enter your current estimated intake to see your nutritional gap.</p>
+            
+            <div class="form-group">
+                <label>Current Calories</label>
+                <input type="number" name="current_calories" placeholder="e.g. 1800">
+            </div>
+            <div class="form-group">
+                <label>Current Protein (g)</label>
+                <input type="number" name="current_protein" placeholder="e.g. 50">
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Analyze & Compare</button>
         </form>
     </div>
 
     <!-- Results Display -->
     <div class="results-container">
         {% if predictions %}
+            <!-- Gap Analysis Section -->
+            {% if gap_analysis %}
+                <div class="card" style="margin-bottom: 2rem; border-left: 5px solid var(--accent);">
+                    <h2 style="margin-bottom: 1.5rem;">Nutritional Gap Analysis</h2>
+                    <div style="display: grid; gap: 1.5rem;">
+                        {% for key, data in gap_analysis.items %}
+                            <div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <span style="font-weight: 600;">{{ key }}</span>
+                                    <span style="color: var(--muted);">{{ data.percentage|stringformat:".1f" }}% of target met</span>
+                                </div>
+                                <div style="height: 12px; background: #f1f5f9; border-radius: 6px; overflow: hidden; display: flex;">
+                                    <div style="width: {{ data.percentage }}%; background: var(--primary-light); height: 100%;"></div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-top: 0.4rem;">
+                                    <span>Current: {{ data.current }}</span>
+                                    <span style="color: #ef4444; font-weight: 700;">Gap: {{ data.gap|stringformat:".1f" }} required</span>
+                                    <span>Target: {{ data.required|stringformat:".1f" }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
             <div class="card" style="margin-bottom: 2rem; border-left: 5px solid var(--primary-light);">
-                <h2 style="margin-bottom: 1.5rem;">Your Daily Requirements</h2>
+                <h2 style="margin-bottom: 1.5rem;">Total Requirements (Result)</h2>
                 <div class="results-grid">
                     {% for key, value in predictions.items %}
                         <div class="result-card">
