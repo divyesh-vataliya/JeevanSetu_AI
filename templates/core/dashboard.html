@@ -323,8 +323,8 @@
         const steps = [
             "Reading document metadata...",
             "Performing OCR analysis...",
-            "Identifying nutritional markers...",
-            "Comparing against healthy benchmarks...",
+            "Extracting Client Details (Age, Weight, Goal)...",
+            "Syncing data to physical profile...",
             "Generating personalized supplement plan..."
         ];
         let step = 0;
@@ -333,10 +333,49 @@
             step++;
             if(step < steps.length) {
                 stepEl.innerText = steps[step];
+                
+                // Simulate data extraction into inputs at step 3
+                if(step === 3) {
+                    autoFillFromReport();
+                }
             } else {
                 clearInterval(interval);
             }
-        }, 1500);
+        }, 1200);
+    }
+
+    function autoFillFromReport() {
+        // Simulated OCR Extraction logic
+        // In a real app, this would come from a server-side OCR response
+        const mockData = {
+            age: 30,
+            height: 172,
+            weight: 82,
+            sex: "Male",
+            goal: "Weight Loss"
+        };
+
+        // Update inputs with animation
+        const inputs = {
+            'age': mockData.age,
+            'height': mockData.height,
+            'weight': mockData.weight,
+            'sex': mockData.sex,
+            'goal': mockData.goal
+        };
+
+        for (const [name, value] of Object.entries(inputs)) {
+            const el = document.querySelector(`[name="${name}"]`);
+            if (el) {
+                el.value = value;
+                el.style.background = '#f0fdf4'; // Light green highlight
+                el.style.transition = 'all 0.5s ease';
+                setTimeout(() => el.style.background = 'white', 2000);
+            }
+        }
+        
+        // Trigger the sex-select toggle
+        if(typeof togglePregnancy === 'function') togglePregnancy();
     }
 
     document.getElementById('report-input').addEventListener('change', function(e) {
