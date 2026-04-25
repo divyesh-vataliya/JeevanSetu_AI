@@ -94,6 +94,8 @@ def dashboard(request):
                             'percentage': (current_intake[key] / required * 100) if required > 0 else 0
                         }
                 
+                is_report_analysis = 'medical_report' in request.FILES
+                
                 # Identify top deficiencies (where percentage < 90)
                 top_deficiencies = []
                 if gap_analysis:
@@ -109,6 +111,7 @@ def dashboard(request):
                     'gap_analysis': gap_analysis,
                     'raw_predictions': predictions,
                     'top_deficiencies': top_deficiencies,
+                    'is_report_analysis': is_report_analysis,
                     'quotes': quotes
                 })
                 

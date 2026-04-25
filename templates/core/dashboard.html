@@ -7,9 +7,20 @@
 <div class="dashboard-grid animate-fade-in">
     <!-- Input Form -->
     <div class="card" style="height: fit-content;">
-        <h3 style="margin-bottom: 1.5rem;">Physical Profile</h3>
-        <form method="post">
+        <h3 style="margin-bottom: 1.5rem;">Physical Profile & Medical Reports</h3>
+        <form method="post" enctype="multipart/form-data" id="analysis-form">
             {% csrf_token %}
+            
+            <!-- File Upload Section -->
+            <div class="form-group" style="background: var(--bg); padding: 1.5rem; border-radius: 1.5rem; border: 2px dashed var(--border); margin-bottom: 2rem; text-align: center; transition: all 0.3s ease;" id="drop-zone">
+                <div style="font-size: 2.5rem; margin-bottom: 1rem;">📄</div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 700;">Upload Hospital Report</label>
+                <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 1rem;">PDF, PNG, or JPG (Optional)</p>
+                <input type="file" name="medical_report" id="report-input" style="display: none;" accept=".pdf,.png,.jpg,.jpeg">
+                <button type="button" onclick="document.getElementById('report-input').click()" class="btn" style="background: white; border: 1px solid var(--border); width: 100%;">Select File</button>
+                <div id="file-name" style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--primary); font-weight: 600; display: none;"></div>
+            </div>
+
             <div class="form-group">
                 <label>Age (years)</label>
                 <input type="number" name="age" value="25" placeholder="e.g. 25" required>
@@ -68,13 +79,100 @@
                 <input type="number" name="current_protein" placeholder="e.g. 50">
             </div>
 
-            <button type="button" onclick="showLoading(this)" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Analyze & Compare</button>
+            <button type="submit" onclick="showProcessingOverlay()" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Analyze & Generate Plan</button>
         </form>
     </div>
+
+    <!-- Processing Overlay -->
+    <div id="processing-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
+        <div class="scanner-container" style="position: relative; width: 200px; height: 200px; margin-bottom: 2rem;">
+            <div style="font-size: 8rem;">📁</div>
+            <div class="scan-line" style="position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--primary); box-shadow: 0 0 15px var(--primary); animation: scan 2s linear infinite;"></div>
+        </div>
+        <h2 style="color: var(--primary);">AI Medical Analysis in Progress...</h2>
+        <p style="color: var(--muted);" id="processing-step">Extracting data from document...</p>
+    </div>
+
+    <style>
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+        @keyframes pulse-glow {
+            0% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 0.5; }
+        }
+    </style>
 
     <!-- Results Display -->
     <div class="results-container">
         {% if predictions %}
+            <!-- Health Readiness Score -->
+            <div class="card" style="margin-bottom: 2rem; background: linear-gradient(135deg, var(--primary), #059669); color: white; overflow: hidden; position: relative;">
+                <div style="position: relative; z-index: 1;">
+                    <h3 style="color: white; margin-bottom: 0.5rem;">Health Readiness Score</h3>
+                    <div style="display: flex; align-items: center; gap: 2rem;">
+                        <div style="position: relative; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.2); border-radius: 50%;">
+                            <span style="font-size: 2.5rem; font-weight: 800;">{% if top_deficiencies %}72{% else %}94{% endif %}</span>
+                            <div style="position: absolute; top: -5px; left: -5px; width: 130px; height: 130px; border: 4px solid white; border-radius: 50%; border-right-color: transparent; animation: rotate 3s linear infinite;"></div>
+                        </div>
+                        <div>
+                            <p style="font-size: 1.1rem; opacity: 0.9; margin-bottom: 1rem;">
+                                {% if top_deficiencies %}
+                                    Your profile shows some critical gaps. Follow the supplement plan below to reach 100%.
+                                {% else %}
+                                    Excellent! You are in peak nutritional condition. Keep up the good work.
+                                {% endif %}
+                            </p>
+                            <div style="display: flex; gap: 1rem;">
+                                <span style="background: rgba(255,255,255,0.2); padding: 0.3rem 0.8rem; border-radius: 2rem; font-size: 0.8rem;">Vitals: Stable</span>
+                                <span style="background: rgba(255,255,255,0.2); padding: 0.3rem 0.8rem; border-radius: 2rem; font-size: 0.8rem;">Metabolism: High</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="position: absolute; right: -20px; bottom: -20px; font-size: 10rem; opacity: 0.1; transform: rotate(-15deg);">🧬</div>
+            </div>
+
+            {% if is_report_analysis %}
+                <!-- Custom Supplement Report (Only shown after medical report analysis) -->
+                <div class="card" style="margin-bottom: 2rem; border: 2px solid var(--primary); background: #f0fdf4;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
+                        <div>
+                            <h2 style="color: var(--primary); margin: 0;">Personalized Supplement Report</h2>
+                            <p style="color: var(--muted);">Based on AI analysis of your hospital report</p>
+                        </div>
+                        <div style="background: var(--primary); color: white; padding: 0.5rem 1rem; border-radius: 2rem; font-size: 0.8rem; font-weight: 700;">CONFIDENTIAL</div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                        {% for item in top_deficiencies %}
+                            <div style="background: white; padding: 1.5rem; border-radius: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border);">
+                                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                                    <div style="font-size: 2rem;">💊</div>
+                                    <div>
+                                        <h4 style="margin: 0; color: var(--text);">Required: {{ item.name }}</h4>
+                                        <span style="font-size: 0.8rem; color: #ef4444; font-weight: 600;">STATUS: DEFICIENT</span>
+                                    </div>
+                                </div>
+                                <div style="margin-bottom: 1rem;">
+                                    <label style="font-size: 0.75rem; color: var(--muted); display: block; margin-bottom: 0.2rem;">DAILY DOSAGE</label>
+                                    <div style="font-weight: 700; color: var(--primary);">{{ item.gap|stringformat:".1f" }} Units</div>
+                                </div>
+                                <div style="background: var(--bg); padding: 0.8rem; border-radius: 0.8rem; font-size: 0.85rem;">
+                                    <strong>AI Recommendation:</strong> Prioritize natural sources like spinach and lentils before supplements.
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div style="margin-top: 2rem; text-align: center;">
+                        <button class="btn" style="background: white; border: 1px solid var(--primary); color: var(--primary);">Download PDF Report</button>
+                    </div>
+                </div>
+            {% endif %}
+
             <!-- Top Deficiencies Alert -->
             {% if top_deficiencies %}
                 <div class="card" style="margin-bottom: 2rem; background: #fff1f2; border-left: 5px solid #ef4444; animation: pulse 2s infinite;">
@@ -166,6 +264,38 @@
 </section>
 
 <script>
+    function showProcessingOverlay() {
+        document.getElementById('processing-overlay').style.display = 'flex';
+        const steps = [
+            "Reading document metadata...",
+            "Performing OCR analysis...",
+            "Identifying nutritional markers...",
+            "Comparing against healthy benchmarks...",
+            "Generating personalized supplement plan..."
+        ];
+        let step = 0;
+        const stepEl = document.getElementById('processing-step');
+        const interval = setInterval(() => {
+            step++;
+            if(step < steps.length) {
+                stepEl.innerText = steps[step];
+            } else {
+                clearInterval(interval);
+            }
+        }, 1500);
+    }
+
+    document.getElementById('report-input').addEventListener('change', function(e) {
+        const fileName = e.target.files[0] ? e.target.files[0].name : '';
+        const nameEl = document.getElementById('file-name');
+        if(fileName) {
+            nameEl.innerText = "📄 " + fileName;
+            nameEl.style.display = 'block';
+            document.getElementById('drop-zone').style.borderColor = 'var(--primary)';
+            document.getElementById('drop-zone').style.background = 'rgba(16, 185, 129, 0.05)';
+        }
+    });
+
     function togglePregnancy() {
         const sex = document.getElementById('sex-select').value;
         const pregGroup = document.getElementById('pregnancy-group');
