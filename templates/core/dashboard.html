@@ -1,0 +1,90 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Dashboard - JeevanSetu AI{% endblock %}
+
+{% block content %}
+<div class="dashboard-grid animate-fade-in">
+    <!-- Input Form -->
+    <div class="card" style="height: fit-content;">
+        <h3 style="margin-bottom: 1.5rem;">Physical Profile</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Age (years)</label>
+                <input type="number" name="age" placeholder="e.g. 25" required>
+            </div>
+            <div class="form-group">
+                <label>Height (cm)</label>
+                <input type="number" step="0.1" name="height" placeholder="e.g. 175" required>
+            </div>
+            <div class="form-group">
+                <label>Weight (kg)</label>
+                <input type="number" step="0.1" name="weight" placeholder="e.g. 70" required>
+            </div>
+            <div class="form-group">
+                <label>Activity Level</label>
+                <select name="activity" required>
+                    <option value="Sedentary">Sedentary (Little to no exercise)</option>
+                    <option value="Moderate">Moderate (3-5 days/week)</option>
+                    <option value="Heavy">Heavy (6-7 days/week)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Sex</label>
+                <select name="sex" id="sex-select" onchange="togglePregnancy()">
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+            </div>
+            <div class="form-group" id="pregnancy-group" style="display: none;">
+                <label>Are you pregnant?</label>
+                <select name="pregnant">
+                    <option value="no">No</option>
+                    <option value="yes">Yes</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Analyze Requirements</button>
+        </form>
+    </div>
+
+    <!-- Results Display -->
+    <div class="results-container">
+        {% if predictions %}
+            <div class="card" style="margin-bottom: 2rem; border-left: 5px solid var(--primary-light);">
+                <h2 style="margin-bottom: 1.5rem;">Your Daily Requirements</h2>
+                <div class="results-grid">
+                    {% for key, value in predictions.items %}
+                        <div class="result-card">
+                            <div class="label">{{ key }}</div>
+                            <div class="value">{{ value|stringformat:".2f" }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="card" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white;">
+                <h3 style="color: white; margin-bottom: 1rem;">Smart Recommendation</h3>
+                <p style="opacity: 0.9;">Based on your profile, we recommend focusing on a balanced diet rich in micronutrients. Check out our <a href="{% url 'supplements' %}" style="text-decoration: underline; color: white; font-weight: 700;">Supplements Guide</a> to find natural sources for these requirements.</p>
+            </div>
+        {% else %}
+            <div class="card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 400px; text-align: center;">
+                <div style="font-size: 5rem; margin-bottom: 1.5rem; opacity: 0.2;">📊</div>
+                <h3>Ready to Analyze</h3>
+                <p style="color: var(--muted); max-width: 400px;">Fill out your physical profile on the left to generate your personalized nutritional roadmap.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function togglePregnancy() {
+        const sex = document.getElementById('sex-select').value;
+        const pregGroup = document.getElementById('pregnancy-group');
+        if (sex === 'Female') {
+            pregGroup.style.display = 'block';
+        } else {
+            pregGroup.style.display = 'none';
+        }
+    }
+</script>
+{% endblock %}

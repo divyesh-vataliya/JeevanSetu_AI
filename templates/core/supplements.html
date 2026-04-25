@@ -1,0 +1,29 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Supplements Guide - JeevanSetu AI{% endblock %}
+
+{% block content %}
+<div class="supplements-container animate-fade-in">
+    <div style="text-align: center; margin-bottom: 4rem;">
+        <h1 style="font-size: 3rem; margin-bottom: 1rem;">Nutritional <span style="color: var(--primary);">Intelligence</span></h1>
+        <p style="color: var(--muted); font-size: 1.25rem;">Learn about essential vitamins and minerals, their benefits, and where to find them naturally.</p>
+    </div>
+
+    <div class="supplements-grid">
+        {% for name, data in supplement_data.items %}
+            <div class="card supplement-card">
+                <div class="supplement-icon">{{ data.icon }}</div>
+                <h3>{{ name }}</h3>
+                <p style="color: var(--muted); margin: 1rem 0;">{{ data.benefits|join:", " }}</p>
+                
+                <h4 style="font-size: 0.875rem; margin-top: auto; border-top: 1px solid var(--border); padding-top: 1rem;">NATURAL SOURCES</h4>
+                <div class="tag-list">
+                    {% for source in data.natural_sources %}
+                        <span class="tag">{{ source }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

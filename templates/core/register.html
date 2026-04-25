@@ -1,0 +1,50 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Sign Up - JeevanSetu AI{% endblock %}
+
+{% block content %}
+<div class="form-container animate-fade-in" style="max-width: 500px;">
+    <h2 style="text-align: center; margin-bottom: 2rem;">Create Your Account</h2>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                    <small style="display: block; color: var(--muted); margin-top: 0.25rem;">{{ field.help_text }}</small>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Create Account</button>
+    </form>
+    <p style="text-align: center; margin-top: 1.5rem; color: var(--muted);">
+        Already have an account? <a href="{% url 'login' %}" style="color: var(--primary); font-weight: 600;">Sign In</a>
+    </p>
+</div>
+
+<style>
+    /* Styling for Django's default form fields */
+    input[type="text"], input[type="password"], input[type="email"] {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border-radius: 0.75rem;
+        border: 1px solid var(--border);
+        background: #f8fafc;
+        transition: var(--transition);
+    }
+    input:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.1);
+    }
+    ul.errorlist {
+        list-style: none;
+        color: #ef4444;
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+        padding: 0;
+    }
+</style>
+{% endblock %}

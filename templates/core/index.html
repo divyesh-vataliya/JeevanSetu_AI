@@ -1,0 +1,33 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<section class="hero animate-fade-in">
+    <h1>Your Intelligence-Powered <br><span style="color: var(--primary);">Nutritional Companion</span></h1>
+    <p>Unlock personalized health insights with JeevanSetu AI. Our advanced algorithms analyze your physical profile to recommend the perfect balance of vitamins and minerals.</p>
+    <div style="display: flex; gap: 1rem;">
+        <a href="{% url 'register' %}" class="btn btn-primary">Get Started Free</a>
+        <a href="#features" class="btn btn-outline">Learn More</a>
+    </div>
+</section>
+
+<section id="features" style="padding: 5rem 2rem; max-width: 1200px; margin: 0 auto;">
+    <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 3rem;">Why Choose JeevanSetu AI?</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+        <div class="card">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">📊</div>
+            <h3>Data-Driven Insights</h3>
+            <p>Utilizes machine learning to provide accurate nutritional requirements based on your age, weight, and activity level.</p>
+        </div>
+        <div class="card">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">💊</div>
+            <h3>Supplement Guide</h3>
+            <p>Discover natural sources and benefits for essential vitamins and minerals tailored to your needs.</p>
+        </div>
+        <div class="card">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🔒</div>
+            <h3>Private & Secure</h3>
+            <p>Your health data is yours alone. We prioritize privacy and security in every calculation.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

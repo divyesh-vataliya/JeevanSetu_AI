@@ -1,33 +1,56 @@
-# Cure for Sure - Nutrition & Supplements Recommendations
+# JeevanSetu AI - Intelligent Nutritional Guidance
 
-A web application that provides personalized nutrition and supplement recommendations based on user profile.
+JeevanSetu AI is a modern, Django-powered web application that provides personalized nutritional and supplement recommendations using machine learning. It aims to bridge the gap between complex health data and actionable daily insights.
 
-## Features
+## ✨ Features
 
-- Home page with information about nutrition in the body
-- User login system
-- Personalized nutrition recommendations based on:
-  - Age
-  - Height
-  - Weight
-  - Activity level
-  - Sex
-  - Pregnancy status (for females)
-- Supplement recommendations with natural food alternatives
+- **Personalized Analytics**: Get custom nutritional requirements based on your age, weight, height, sex, and activity level.
+- **ML-Powered Predictions**: Uses a Random Forest Regressor trained on comprehensive nutritional datasets.
+- **Supplements Guide**: Detailed information on essential vitamins and minerals, their benefits, and natural food sources.
+- **Premium UI/UX**: Built with a modern, responsive design system featuring glassmorphism and smooth animations.
+- **Secure Authentication**: Built-in Django authentication for personal health data protection.
 
-## Installation
+## 🚀 Getting Started
 
-1. Clone this repository
-2. Install dependencies:
+### Prerequisites
+
+- Python 3.x
+- pip
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/divyesh-vataliya/JeevanSetu_AI.git
    ```
+
+2. Install the required packages:
+   ```bash
    pip install -r requirements.txt
    ```
-3. Run the application:
-   ```
-   python app.py
-   ```
-4. Open your browser and navigate to `http://localhost:5000`
 
-## Data
+3. Run migrations:
+   ```bash
+   python manage.py migrate
+   ```
 
-The application uses a nutritional requirements dataset for predictions. 
+4. Start the development server:
+   ```bash
+   python manage.py runserver
+   ```
+
+5. Access the application at `http://127.0.0.1:8000/`
+
+## 🛠️ Technology Stack
+
+- **Backend**: Django (Python)
+- **Machine Learning**: Scikit-learn, Pandas, NumPy
+- **Frontend**: HTML5, Vanilla CSS3 (Custom Design System)
+- **Database**: SQLite (Default)
+
+## 📊 How it Works
+
+The application takes user physical profile inputs and passes them through a series of trained Random Forest models (one for each nutritional target). These models predict the optimal daily intake for calories, proteins, vitamins, and minerals.
+
+---
+Built with ❤️ for a healthier world.
