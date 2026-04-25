@@ -72,28 +72,25 @@ def get_ml_resources():
     X = data[features]
     y = data[_targets]
     
-    # Train Optimized Models
-    _models = {}
-    for target in _targets:
-        # Pipeline with scaling for better accuracy
-        pipeline = Pipeline([
-            ('scaler', StandardScaler()),
-            ('rf', RandomForestRegressor(
-                n_estimators=200, 
-                max_depth=15,
-                min_samples_split=2,
-                min_samples_leaf=1,
-                random_state=42,
-                n_jobs=-1 # Parallel training
-            ))
-        ])
-        pipeline.fit(X, y[target])
-        _models[target] = pipeline
+    # Train Optimized Multi-Output Model
+    # A single RandomForestRegressor can handle multiple outputs automatically
+    # and is much more memory efficient than 14 separate models.
+    pipeline = Pipeline([
+        ('scaler', StandardScaler()),
+        ('rf', RandomForestRegressor(
+            n_estimators=100, 
+            max_depth=10,
+            random_state=42,
+            n_jobs=-1
+        ))
+    ])
+    pipeline.fit(X, y)
+    _models = pipeline
     
     # Save to cache
-    joblib.dump(_models, model_cache_path)
+    joblib.dump(_models, model_cache_path, compress=3) # Use compression
     joblib.dump({'sex': _label_encoder_sex, 'activity': _label_encoder_activity}, encoders_cache_path)
-    print("Trained and cached optimized models with Pipeline.")
+    print("Trained and cached optimized Multi-Output model.")
         
     return _models, _label_encoder_sex, _label_encoder_activity
 
@@ -111,10 +108,9 @@ def predict_nutritional_requirements(age, height, weight, activity, sex, pregnan
         # Create input array
         user_input = np.array([[age, height, weight, sex_encoded, activity_encoded, pregnant, bmi]])
         
-        # Predict all targets
-        predictions = {}
-        for target, model in models.items():
-            predictions[target] = float(model.predict(user_input)[0])
+        # Predict all targets at once
+        raw_preds = models.predict(user_input)[0]
+        predictions = {target: float(pred) for target, pred in zip(_targets, raw_preds)}
         
         return predictions
     except Exception as e:
