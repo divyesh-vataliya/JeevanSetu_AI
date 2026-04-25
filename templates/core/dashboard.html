@@ -12,28 +12,28 @@
             {% csrf_token %}
             <div class="form-group">
                 <label>Age (years)</label>
-                <input type="number" name="age" placeholder="e.g. 25" required>
+                <input type="number" name="age" value="25" placeholder="e.g. 25" required>
             </div>
             <div class="form-group">
                 <label>Height (cm)</label>
-                <input type="number" step="0.1" name="height" placeholder="e.g. 175" required>
+                <input type="number" step="0.1" name="height" value="175" placeholder="e.g. 175" required>
             </div>
             <div class="form-group">
                 <label>Weight (kg)</label>
-                <input type="number" step="0.1" name="weight" placeholder="e.g. 70" required>
+                <input type="number" step="0.1" name="weight" value="70" placeholder="e.g. 70" required>
             </div>
             <div class="form-group">
                 <label>Activity Level</label>
                 <select name="activity" required>
                     <option value="Sedentary">Sedentary (Little to no exercise)</option>
-                    <option value="Moderate">Moderate (3-5 days/week)</option>
+                    <option value="Moderate" selected>Moderate (3-5 days/week)</option>
                     <option value="Heavy">Heavy (6-7 days/week)</option>
                 </select>
             </div>
             <div class="form-group">
                 <label>Health Goal</label>
                 <select name="goal">
-                    <option value="Maintenance">Maintenance (Stay Healthy)</option>
+                    <option value="Maintenance" selected>Maintenance (Stay Healthy)</option>
                     <option value="Weight Loss">Weight Loss (Fat Loss)</option>
                     <option value="Muscle Gain">Muscle Gain (Bulking)</option>
                     <option value="Athletic Performance">Athletic Performance</option>
@@ -43,7 +43,7 @@
             <div class="form-group">
                 <label>Sex</label>
                 <select name="sex" id="sex-select" onchange="togglePregnancy()">
-                    <option value="Male">Male</option>
+                    <option value="Male" selected>Male</option>
                     <option value="Female">Female</option>
                 </select>
             </div>
