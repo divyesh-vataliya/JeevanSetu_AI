@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-_q-i06!g(7qo70vu8(i#-mivxed0qp@fql2=v6ggp0szsz96yw
 import os
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['jeevansetu-ai.onrender.com', '127.0.0.1', 'localhost', '.onrender.com']
 
