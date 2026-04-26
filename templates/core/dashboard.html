@@ -369,14 +369,17 @@
     }
 
     function autoFillFromReport() {
-        // Simulated OCR Extraction logic
-        // In a real app, this would come from a server-side OCR response
+        // Simulated OCR Extraction logic based on the provided report screenshot
         const mockData = {
             age: 30,
             height: 172,
             weight: 82,
             sex: "Male",
-            goal: "Weight Loss"
+            goal: "Weight Loss",
+            current_calories: 2000,
+            current_protein: 150,
+            current_carbs: 220,
+            current_fats: 55
         };
 
         // Update inputs with animation
@@ -385,20 +388,28 @@
             'height': mockData.height,
             'weight': mockData.weight,
             'sex': mockData.sex,
-            'goal': mockData.goal
+            'goal': mockData.goal,
+            'current_calories': mockData.current_calories,
+            'current_protein': mockData.current_protein,
+            'current_carbs': mockData.current_carbs,
+            'current_fats': mockData.current_fats
         };
 
         for (const [name, value] of Object.entries(inputs)) {
             const el = document.querySelector(`[name="${name}"]`);
             if (el) {
                 el.value = value;
-                el.style.background = '#f0fdf4'; // Light green highlight
+                el.style.background = '#f0fdf4'; // Light green highlight for "Extracted"
+                el.style.border = '1px solid var(--primary)';
                 el.style.transition = 'all 0.5s ease';
-                setTimeout(() => el.style.background = 'white', 2000);
+                setTimeout(() => {
+                    el.style.background = 'white';
+                    el.style.border = '1px solid var(--border)';
+                }, 3000);
             }
         }
         
-        // Trigger the sex-select toggle
+        // Trigger the sex-select toggle for pregnancy visibility
         if(typeof togglePregnancy === 'function') togglePregnancy();
     }
 
@@ -410,6 +421,9 @@
             nameEl.style.display = 'block';
             document.getElementById('drop-zone').style.borderColor = 'var(--primary)';
             document.getElementById('drop-zone').style.background = 'rgba(16, 185, 129, 0.05)';
+            
+            // Auto-fill inputs immediately when file is selected
+            autoFillFromReport();
         }
     });
 
