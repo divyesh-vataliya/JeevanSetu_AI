@@ -197,6 +197,29 @@ def get_supplement_data():
         }
     }
 
+def adjust_predictions_for_pregnancy(predictions):
+    """
+    Adjusts predicted values for pregnant women based on WHO & ICMR-NIN guidelines.
+    Expectant mothers require significant increases in specific micro and macronutrients.
+    """
+    if not predictions:
+        return predictions
+        
+    adjusted = predictions.copy()
+    
+    # WHO/NIN Pregnancy Adjustments
+    adjusted['Calories (kcal)'] += 350  # Average increase for 2nd/3rd trimester
+    adjusted['Protein (g)'] += 25      # Essential for fetal development
+    adjusted['Iron (mg)'] = 27         # Standard pregnancy requirement (WHO)
+    adjusted['Calcium (mg)'] = 1200    # Increased for bone development
+    adjusted['Vitamin B12 (mcg)'] += 0.4 # Higher neurological requirement
+    adjusted['Vitamin C (mg)'] += 10   # Immune support
+    
+    # Folate/Folic Acid is critical (added as Vitamin B9 or similar if exists)
+    # Since our targets are fixed, we ensure existing ones are boosted
+    
+    return adjusted
+
 def adjust_predictions_by_goal(predictions, goal):
     """
     Adjusts predicted values based on user's health goal.

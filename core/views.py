@@ -49,7 +49,6 @@ def logout_view(request):
 def dashboard(request):
     predictions = None
     gap_analysis = None
-    from .utils import get_motivational_quotes, adjust_predictions_by_goal
     quotes = get_motivational_quotes()
     
     if request.method == 'POST':
@@ -69,8 +68,11 @@ def dashboard(request):
                 # Adjust based on goal
                 predictions = adjust_predictions_by_goal(raw_predictions, goal)
                 
+                # Apply Pregnancy Adjustments if applicable
+                if pregnant:
+                    predictions = adjust_predictions_for_pregnancy(predictions)
+                
                 # Categorize results for UI
-                from .utils import get_categorized_predictions
                 predictions_categorized = get_categorized_predictions(predictions)
                 
                 # Calculate Deficiency (Gap)
@@ -112,6 +114,7 @@ def dashboard(request):
                     'raw_predictions': predictions,
                     'top_deficiencies': top_deficiencies,
                     'is_report_analysis': is_report_analysis,
+                    'is_pregnant': pregnant,
                     'quotes': quotes
                 })
                 

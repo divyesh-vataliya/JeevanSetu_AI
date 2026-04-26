@@ -82,6 +82,14 @@
                 <label>Current Protein (g)</label>
                 <input type="number" name="current_protein" placeholder="e.g. 50">
             </div>
+            <div class="form-group">
+                <label>Current Carbs (g)</label>
+                <input type="number" name="current_carbs" placeholder="e.g. 200">
+            </div>
+            <div class="form-group">
+                <label>Current Fats (g)</label>
+                <input type="number" name="current_fats" placeholder="e.g. 60">
+            </div>
 
             <button type="submit" onclick="showProcessingOverlay()" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Analyze & Generate Plan</button>
         </form>
@@ -129,9 +137,12 @@
                                     Excellent! You are in peak nutritional condition. Keep up the good work.
                                 {% endif %}
                             </p>
-                            <div style="display: flex; gap: 1rem;">
+                            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
                                 <span style="background: rgba(255,255,255,0.2); padding: 0.3rem 0.8rem; border-radius: 2rem; font-size: 0.8rem;">Vitals: Stable</span>
                                 <span style="background: rgba(255,255,255,0.2); padding: 0.3rem 0.8rem; border-radius: 2rem; font-size: 0.8rem;">Metabolism: High</span>
+                                {% if is_pregnant %}
+                                    <span style="background: #fdf2f8; color: #db2777; padding: 0.3rem 0.8rem; border-radius: 2rem; font-size: 0.8rem; font-weight: 700;">🤰 Maternal Health Mode Active</span>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
