@@ -3,7 +3,14 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib import messages
-from .utils import predict_nutritional_requirements, get_supplement_data
+from .utils import (
+    predict_nutritional_requirements, 
+    get_supplement_data, 
+    get_motivational_quotes, 
+    adjust_predictions_by_goal, 
+    adjust_predictions_for_pregnancy, 
+    get_categorized_predictions
+)
 
 def index(request):
     if request.user.is_authenticated:
