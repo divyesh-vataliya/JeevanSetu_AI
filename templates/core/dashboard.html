@@ -235,6 +235,30 @@
                 </div>
             {% endif %}
 
+            <!-- Required Supplements Section -->
+            {% if top_deficiencies %}
+                <div class="card animate-slide-up" style="margin-bottom: 2rem; border-top: 5px solid var(--primary);">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                        <span style="font-size: 2rem;">💊</span>
+                        <h3 style="margin: 0;">Smart Supplement Recommendations</h3>
+                    </div>
+                    <p style="color: var(--muted); margin-bottom: 2rem;">Based on your identified nutritional gaps, we recommend the following supplements to optimize your health:</p>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
+                        {% for item in top_deficiencies %}
+                            <div style="background: var(--bg); padding: 1.5rem; border-radius: 1.5rem; border: 1px solid var(--border); transition: transform 0.3s ease; cursor: pointer; text-align: center;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                                <div style="font-size: 2.5rem; margin-bottom: 1rem;">
+                                    {% if 'Vitamin A' in item.name %}👁️{% elif 'Vitamin B12' in item.name %}🧠{% elif 'Vitamin C' in item.name %}🛡️{% elif 'Vitamin D' in item.name %}☀️{% elif 'Calcium' in item.name %}🦷{% elif 'Iron' in item.name %}🩸{% elif 'Magnesium' in item.name %}⚡{% elif 'Zinc' in item.name %}🔬{% elif 'Omega-3' in item.name %}🐟{% else %}💊{% endif %}
+                                </div>
+                                <h4 style="margin: 0 0 0.5rem 0; color: var(--text);">{{ item.name }}</h4>
+                                <div style="font-size: 0.9rem; color: #ef4444; font-weight: 800;">{{ item.gap|stringformat:".1f" }} more needed</div>
+                                <div style="font-size: 0.75rem; color: var(--muted); margin-top: 0.5rem;">Current Status: {{ item.percentage|stringformat:".1f" }}%</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
             <!-- Gap Analysis Section -->
             {% if gap_analysis %}
                 <div class="card" style="margin-bottom: 2rem; border-left: 5px solid var(--accent);">
@@ -291,7 +315,7 @@
 </div>
 
 <!-- Quotes Section -->
-<section style="padding: 4rem 2rem; max-width: 1200px; margin: 4rem auto 0 auto; background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{% static "images/quotes.png" %}'); background-size: cover; background-position: center; border-radius: 2rem; color: white; text-align: center; overflow: hidden;" class="animate-fade-in">
+<section style="padding: 4rem 2rem; max-width: 1200px; margin: 4rem auto 0 auto; background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{% static 'images/wellness_bg.png' %}'); background-size: cover; background-position: center; border-radius: 2rem; color: white; text-align: center; overflow: hidden;" class="animate-fade-in">
     <div style="padding: 2rem;">
         <h2 style="color: white; font-size: 2.5rem; margin-bottom: 2rem;">Motivational Health Quotes</h2>
         <div id="quote-carousel" style="min-height: 150px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
