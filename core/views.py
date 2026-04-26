@@ -47,9 +47,13 @@ def logout_view(request):
 
 @login_required
 def dashboard(request):
-    predictions = None
+    predictions_categorized = None
     gap_analysis = None
+    predictions = None
     quotes = get_motivational_quotes()
+    top_deficiencies = []
+    is_report_analysis = False
+    is_pregnant = False
     
     if request.method == 'POST':
         try:
@@ -59,17 +63,17 @@ def dashboard(request):
             activity = request.POST.get('activity')
             sex = request.POST.get('sex')
             goal = request.POST.get('goal')
-            pregnant = 1 if request.POST.get('pregnant') == 'yes' and sex == 'Female' else 0
+            is_pregnant = 1 if request.POST.get('pregnant') == 'yes' and sex == 'Female' else 0
             
             # Get base predictions
-            raw_predictions = predict_nutritional_requirements(age, height, weight, activity, sex, pregnant)
+            raw_predictions = predict_nutritional_requirements(age, height, weight, activity, sex, is_pregnant)
             
             if raw_predictions:
                 # Adjust based on goal
                 predictions = adjust_predictions_by_goal(raw_predictions, goal)
                 
                 # Apply Pregnancy Adjustments if applicable
-                if pregnant:
+                if is_pregnant:
                     predictions = adjust_predictions_for_pregnancy(predictions)
                 
                 # Categorize results for UI
@@ -99,7 +103,6 @@ def dashboard(request):
                 is_report_analysis = 'medical_report' in request.FILES
                 
                 # Identify top deficiencies (where percentage < 90)
-                top_deficiencies = []
                 if gap_analysis:
                     # Sort by percentage met (lowest first)
                     sorted_gaps = sorted(gap_analysis.items(), key=lambda x: x[1]['percentage'])
@@ -114,7 +117,7 @@ def dashboard(request):
                     'raw_predictions': predictions,
                     'top_deficiencies': top_deficiencies,
                     'is_report_analysis': is_report_analysis,
-                    'is_pregnant': pregnant,
+                    'is_pregnant': is_pregnant,
                     'quotes': quotes
                 })
                 
@@ -124,8 +127,11 @@ def dashboard(request):
             messages.error(request, f"Error: {str(e)}")
             
     return render(request, 'core/dashboard.html', {
-        'predictions': predictions,
+        'predictions': predictions_categorized,
         'gap_analysis': gap_analysis,
+        'top_deficiencies': top_deficiencies,
+        'is_report_analysis': is_report_analysis,
+        'is_pregnant': is_pregnant,
         'quotes': quotes
     })
 
